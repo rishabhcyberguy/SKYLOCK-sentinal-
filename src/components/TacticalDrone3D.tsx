@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-const TARGET_RADAR_URL = 'https://ais-dev-pvuh6g7dlsd6fhhvtdj5ql-785036556038.asia-southeast1.run.app/?view=radar';
+const TARGET_RADAR_URL = 'https://skylocksentinal.vercel.app/?view=radar';
 
 export const TacticalDrone3D: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
