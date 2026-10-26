@@ -204,19 +204,19 @@ export const LocationIntel: React.FC<LocationIntelProps> = ({ isStandalone = fal
 
         {/* BOLD & ENHANCED TITLE - Enlarged with prominent defense typography */}
         <div className="location-title-block my-3">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.25rem] font-black font-mono tracking-widest text-[#f7f7f3] leading-none m-0">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.25rem] font-black font-mono tracking-widest text-[#f7f7f3] leading-none m-0 scroll-reveal-title">
             OPEN LOCATION INTELLIGENCE
           </h1>
-          <p className="text-[#8aa0a8] text-xs font-mono mt-2 font-bold tracking-widest uppercase flex items-center gap-2">
+          <p className="text-[#8aa0a8] text-xs font-mono mt-2 font-bold tracking-widest uppercase flex items-center gap-2 scroll-reveal-text">
             <span className="w-2 h-2 rounded-full bg-[#00ff66] inline-block shadow-[0_0_8px_#00ff66]"></span>
             GLOBAL GEOSPATIAL AIRSPACE CORRELATION & SATELLITE RF RECONNAISSANCE
           </p>
         </div>
 
-        <h2 className="text-base sm:text-lg font-bold text-[#f7f7f3] mt-3 mb-1.5 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold text-[#f7f7f3] mt-3 mb-1.5 leading-snug scroll-reveal-title">
           Precision signal geolocation & emitter coordinates.
         </h2>
-        <p className="text-xs sm:text-sm text-[#a0b0b8] leading-relaxed max-w-2xl mb-4">
+        <p className="text-xs sm:text-sm text-[#a0b0b8] leading-relaxed max-w-2xl mb-4 scroll-reveal-text">
           Combine browser GPS with free network-location providers and OpenStreetMap reverse geocoding. Selected coordinates center high-resolution satellite imagery.
         </p>
         <div className="location-actions flex flex-wrap gap-3 mb-4">

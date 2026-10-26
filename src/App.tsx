@@ -14,9 +14,11 @@ import { WatchlistModal } from './components/WatchlistModal';
 import { StandaloneRadarPage } from './components/StandaloneRadarPage';
 import { StandaloneLocationPage } from './components/StandaloneLocationPage';
 import { TacticalDrone3D } from './components/TacticalDrone3D';
+import { useScrollReveal } from './hooks/useScrollReveal';
 import { ScenarioType, SpeedType } from './types/airspace';
 
 const AirspaceDashboard: React.FC = () => {
+  useScrollReveal();
   const { user, isDemoSession } = useAuth();
   const {
     tracks,
@@ -124,15 +126,15 @@ const AirspaceDashboard: React.FC = () => {
             <img className="hero-image" src="/assets/earth-orbit.webp" alt="Night Earth from orbit" />
             <div className="hero-scrim"></div>
             <div className="hero-content">
-              <div className="eyebrow">
+              <div className="eyebrow scroll-reveal-text">
                 <span className="eyebrow-line"></span>COUNTER-DRONE MONITORING / REAL-TIME CLOUD DECK
               </div>
-              <h1>
+              <h1 className="scroll-reveal-title">
                 See the airspace
                 <br />
                 <em>before it becomes a threat.</em>
               </h1>
-              <p>
+              <p className="scroll-reveal-text">
                 Track signals, project trajectories, and store synchronized incident logs with real-time Firebase database.
               </p>
               <div className="hero-tags flex flex-wrap gap-2 pt-2">
@@ -159,47 +161,61 @@ const AirspaceDashboard: React.FC = () => {
             <div className="control-context flex-wrap gap-2 sm:gap-3">
               <span className="mini-label">SCENARIO</span>
 
-              {/* Scenario Selection with Digital Green Checkboxes */}
-              <div className="scenario-checkbox-group flex items-center gap-2">
+              {/* Scenario Selection: Enhanced Solid Military Control (Zero Gradients, Zero Fuzzy Glow) */}
+              <div className="scenario-checkbox-group flex items-center gap-1.5 p-1 bg-[#020609] border border-[#1b3a47] rounded-[2px]">
                 {([
-                  { id: 'normal', label: 'NORMAL' },
-                  { id: 'anomalous', label: 'ANOMALOUS' },
-                  { id: 'high-threat', label: 'HIGH THREAT' },
+                  { id: 'normal', label: 'NORMAL', defcon: 'DEFCON 4', code: '01' },
+                  { id: 'anomalous', label: 'ANOMALOUS', defcon: 'DEFCON 3', code: '02' },
+                  { id: 'high-threat', label: 'HIGH THREAT', defcon: 'DEFCON 1', code: '03' },
                 ] as const).map((s) => {
                   const isChecked = scenario === s.id;
+                  let borderStyle = 'border-[#1b3a47]';
+                  let bgStyle = 'bg-[#050e13]';
+                  let textStyle = 'text-[#7d939e]';
+                  let dotColor = 'bg-[#2d5564]';
+
+                  if (isChecked) {
+                    if (s.id === 'normal') {
+                      borderStyle = 'border-[#00ff66]';
+                      bgStyle = 'bg-[#002b12]';
+                      textStyle = 'text-[#00ff66]';
+                      dotColor = 'bg-[#00ff66]';
+                    } else if (s.id === 'anomalous') {
+                      borderStyle = 'border-[#f5f0d4]';
+                      bgStyle = 'bg-[#2b2405]';
+                      textStyle = 'text-[#f5f0d4]';
+                      dotColor = 'bg-[#f5f0d4]';
+                    } else if (s.id === 'high-threat') {
+                      borderStyle = 'border-[#ef4a3f]';
+                      bgStyle = 'bg-[#33080b]';
+                      textStyle = 'text-[#ef4a3f]';
+                      dotColor = 'bg-[#ef4a3f]';
+                    }
+                  }
+
                   return (
-                    <label
+                    <button
                       key={s.id}
-                      className={`scenario-checkbox-item flex items-center gap-1.5 cursor-pointer select-none text-[10px] font-mono font-bold tracking-wider px-2 py-1 rounded border transition-all ${
-                        isChecked
-                          ? 'border-[#00ff66] bg-[#00ff66]/15 text-[#00ff66] shadow-[0_0_10px_rgba(0,255,102,0.3)]'
-                          : 'border-[#1b5961] bg-[#04141b]/80 text-[#8aa0a8] hover:border-[#72dbc2]/50 hover:text-[#dffbfa]'
-                      }`}
-                      title={`Switch scenario to ${s.label}`}
+                      type="button"
+                      onClick={() => setScenario(s.id)}
+                      className={`scenario-btn-solid flex items-center gap-2 cursor-pointer select-none text-[11px] font-mono font-bold tracking-wider px-2.5 py-1.5 border transition-colors ${borderStyle} ${bgStyle} ${textStyle}`}
+                      title={`Activate ${s.label} profile (${s.defcon})`}
                     >
                       <span
-                        className={`scenario-checkbox-box flex items-center justify-center w-3.5 h-3.5 rounded-[2px] border transition-all ${
-                          isChecked
-                            ? 'border-[#00ff66] bg-[#04141b] shadow-[0_0_8px_rgba(0,255,102,0.6)]'
-                            : 'border-[#2d5564] bg-[#04141b]'
-                        }`}
+                        className={`w-3 h-3 flex items-center justify-center border ${
+                          isChecked ? borderStyle : 'border-[#2d5564]'
+                        } bg-[#020609]`}
                       >
-                        {isChecked && (
-                          <span
-                            className="scenario-checkbox-inner w-2 h-2 rounded-[1px] bg-[#00ff66] shadow-[0_0_6px_#00ff66]"
-                            style={{ backgroundColor: '#00ff66' }}
-                          />
-                        )}
+                        {isChecked && <span className={`w-1.5 h-1.5 ${dotColor}`} />}
                       </span>
-                      <input
-                        type="checkbox"
-                        name="scenario-column-toggle"
-                        checked={isChecked}
-                        onChange={() => setScenario(s.id)}
-                        className="sr-only"
-                      />
-                      <span>{s.label}</span>
-                    </label>
+                      <span className="opacity-60 text-[9px]">{s.code}</span>
+                      <span className="font-extrabold">{s.label}</span>
+                      <span className={`text-[8px] font-mono px-1 py-0.5 border ${
+                        isChecked ? borderStyle : 'border-[#1b3a47] text-[#556972]'
+                      } hidden sm:inline-block`}>
+                        {s.defcon}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
@@ -341,9 +357,9 @@ const AirspaceDashboard: React.FC = () => {
               {/* Asset Briefing Section */}
               <div className="asset-briefing">
                 <div className="briefing-copy">
-                  <div className="panel-kicker">VISUAL REFERENCE / AIRSPACE CONTEXT</div>
-                  <h2>Mission imagery, one common defense picture.</h2>
-                  <p>
+                  <div className="panel-kicker scroll-reveal-text">VISUAL REFERENCE / AIRSPACE CONTEXT</div>
+                  <h2 className="scroll-reveal-title">Mission imagery, one common defense picture.</h2>
+                  <p className="scroll-reveal-text">
                     Reference imagery anchors the operational context. Features persistent real-time database state and authentication powered by Google Firebase.
                   </p>
                   <div className="briefing-foot flex flex-wrap gap-4 pt-2">

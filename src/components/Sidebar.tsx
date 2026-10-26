@@ -52,90 +52,90 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Nav items */}
       <nav className="primary-nav space-y-1">
         <button
-          className={`nav-item ${activeView === 'overview' ? 'active' : ''}`}
+          className={`nav-item group ${activeView === 'overview' ? 'active' : ''}`}
           onClick={() => scrollToSection('overview-section', 'overview')}
         >
-          <span className="nav-icon">⌁</span>
-          <span>Overview</span>
-          <kbd>01</kbd>
+          <span className="nav-icon transition-transform duration-200 group-hover:scale-125 group-hover:text-[#00ff66]">⌁</span>
+          <span className="font-mono font-extrabold tracking-wider text-xs">Overview</span>
+          <kbd className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded bg-[#0a161d] border border-[#1b3a47] text-[#72dbc2]">01</kbd>
         </button>
 
         <button
-          className={`nav-item ${activeView === 'tracks' ? 'active' : ''}`}
+          className={`nav-item group ${activeView === 'tracks' ? 'active' : ''}`}
           onClick={() => scrollToSection('tracks-section', 'tracks')}
         >
-          <span className="nav-icon">◈</span>
-          <span>Track library</span>
-          <kbd>02</kbd>
+          <span className="nav-icon transition-transform duration-200 group-hover:scale-125 group-hover:text-[#00ff66]">◈</span>
+          <span className="font-mono font-extrabold tracking-wider text-xs">Track library</span>
+          <kbd className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded bg-[#0a161d] border border-[#1b3a47] text-[#72dbc2]">02</kbd>
         </button>
 
         <button
-          className={`nav-item ${activeView === 'alerts' ? 'active' : ''}`}
+          className={`nav-item group ${activeView === 'alerts' ? 'active' : ''}`}
           onClick={() => scrollToSection('alerts-section', 'alerts')}
         >
-          <span className="nav-icon">!</span>
-          <span>Alert queue</span>
-          {alertCount > 0 && <span className="nav-count">{alertCount}</span>}
+          <span className="nav-icon transition-transform duration-200 group-hover:scale-125 group-hover:text-[#ef4a3f]">!</span>
+          <span className="font-mono font-extrabold tracking-wider text-xs">Alert queue</span>
+          {alertCount > 0 && <span className="nav-count animate-pulse font-mono font-black">{alertCount}</span>}
         </button>
 
         <button
-          className={`nav-item ${activeView === 'location' ? 'active' : ''}`}
+          className={`nav-item group ${activeView === 'location' ? 'active' : ''}`}
           onClick={() => scrollToSection('location-section', 'location')}
         >
-          <span className="nav-icon">⌖</span>
-          <span>Location intel</span>
-          <kbd>03</kbd>
+          <span className="nav-icon transition-transform duration-200 group-hover:scale-125 group-hover:text-[#00ff66]">⌖</span>
+          <span className="font-mono font-extrabold tracking-wider text-xs">Location intel</span>
+          <kbd className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded bg-[#0a161d] border border-[#1b3a47] text-[#72dbc2]">03</kbd>
         </button>
 
         <button
-          className={`nav-item ${activeView === 'systems' ? 'active' : ''}`}
+          className={`nav-item group ${activeView === 'systems' ? 'active' : ''}`}
           onClick={() => scrollToSection('systems-section', 'systems')}
         >
-          <span className="nav-icon">◌</span>
-          <span>Investigation</span>
-          <kbd>04</kbd>
+          <span className="nav-icon transition-transform duration-200 group-hover:scale-125 group-hover:text-[#00ff66]">◌</span>
+          <span className="font-mono font-extrabold tracking-wider text-xs">Investigation</span>
+          <kbd className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded bg-[#0a161d] border border-[#1b3a47] text-[#72dbc2]">04</kbd>
         </button>
 
         <button
-          className={`nav-item ${activeView === 'uav' ? 'active' : ''}`}
+          className={`nav-item group ${activeView === 'uav' ? 'active' : ''}`}
           onClick={() => scrollToSection('tactical-drone-section', 'uav')}
         >
-          <span className="nav-icon text-[#00ff66]">✈</span>
-          <span>3D Tactical Drone</span>
-          <kbd>05</kbd>
+          <span className="nav-icon text-[#00ff66] transition-transform duration-200 group-hover:scale-125">✈</span>
+          <span className="font-mono font-extrabold tracking-wider text-xs text-[#00ff66]">3D Tactical Drone</span>
+          <kbd className="font-mono font-bold text-[9px] px-1.5 py-0.5 rounded bg-[#00ff66]/15 border border-[#00ff66]/50 text-[#00ff66]">05</kbd>
         </button>
 
         {/* Dedicated Standalone Pop-out Pages */}
         <div className="pt-2 mt-2 border-t border-[#d7e6eb]/15">
-          <div className="px-3 py-1 text-[9px] font-mono font-bold text-[#8aa0a8] tracking-wider uppercase">
+          <div className="px-3 py-1 text-[9px] font-mono font-extrabold text-[#8aa0a8] tracking-widest uppercase">
             STANDALONE FULL PAGES
           </div>
           <a
             href="?view=radar"
             target="_blank"
             rel="noopener noreferrer"
-            className="nav-item text-[#72dbc2] hover:bg-[#00a7bd]/15 w-full flex items-center justify-between transition-colors"
+            className="nav-item group text-[#72dbc2] hover:bg-[#00a7bd]/20 w-full flex items-center justify-between transition-all"
             title="Open Operational Radar in a new window"
           >
             <div className="flex items-center gap-2">
-              <span className="nav-icon text-[#00ff66]">◈</span>
-              <span>Radar View</span>
+              <span className="nav-icon text-[#00ff66] transition-transform duration-200 group-hover:scale-125">◈</span>
+              <span className="font-mono font-extrabold tracking-wider text-xs">Radar View</span>
             </div>
-            <span className="text-[#00ff66] font-bold text-xs">↗</span>
+            <span className="text-[#00ff66] font-black text-xs transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
           </a>
 
           <a
             href="?view=location-intel"
             target="_blank"
             rel="noopener noreferrer"
-            className="nav-item text-[#72dbc2] hover:bg-[#00a7bd]/15 w-full flex items-center justify-between transition-colors"
+            className="nav-item group text-[#72dbc2] hover:bg-[#00a7bd]/20 w-full flex items-center justify-between transition-all"
             title="Open Open Location Intelligence in a new window"
           >
             <div className="flex items-center gap-2">
-              <span className="nav-icon text-[#00ff66]">⌖</span>
-              <span>Location Intel</span>
+              <span className="nav-icon text-[#00ff66] transition-transform duration-200 group-hover:scale-125">⌖</span>
+              <span className="font-mono font-extrabold tracking-wider text-xs">Location Intel</span>
             </div>
-            <span className="text-[#00ff66] font-bold text-xs">↗</span>
+            <span className="text-[#00ff66] font-black text-xs transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
           </a>
         </div>
 
