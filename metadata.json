@@ -1,0 +1,6 @@
+{
+  "name": "SKYLOCK SENITAL",
+  "description": "Counter-drone monitoring and airspace security platform with Firebase real-time database, Google Authentication, and trajectory prediction.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

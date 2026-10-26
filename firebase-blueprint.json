@@ -1,0 +1,232 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered operator profile and permissions in Aegis Airspace Security.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the operator"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Operator email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Callsign or operator display name",
+          "maxLength": 64
+        },
+        "callsign": {
+          "type": "string",
+          "description": "Airspace callsign code",
+          "maxLength": 32
+        },
+        "role": {
+          "type": "string",
+          "enum": ["operator", "commander", "observer", "admin"],
+          "description": "Access role within the defense command deck"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Server timestamp of profile creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Server timestamp of profile update"
+        }
+      },
+      "required": ["userId", "email", "role"]
+    },
+    "AirspaceSession": {
+      "title": "AirspaceSession",
+      "description": "Real-time operator simulation controls, active scenario, and synchronization state.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owning operator UID"
+        },
+        "scenario": {
+          "type": "string",
+          "enum": ["normal", "anomalous", "high-threat"],
+          "description": "Active operational radar scenario"
+        },
+        "speed": {
+          "type": "string",
+          "enum": ["slow", "normal", "fast"],
+          "description": "Telemetry cadence multiplier"
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Whether radar sweep and telemetry are paused"
+        },
+        "selectedTrackId": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Currently focused aerial track ID"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Server timestamp of last state change"
+        }
+      },
+      "required": ["userId", "scenario", "speed", "paused"]
+    },
+    "AcknowledgedAlert": {
+      "title": "AcknowledgedAlert",
+      "description": "Operator review and acknowledgement of priority airspace security alerts.",
+      "type": "object",
+      "properties": {
+        "trackId": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Track ID being acknowledged"
+        },
+        "callsign": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Target callsign name"
+        },
+        "operatorId": {
+          "type": "string",
+          "description": "UID of the acknowledging operator"
+        },
+        "operatorCallsign": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Callsign of acknowledging operator"
+        },
+        "threatLevel": {
+          "type": "string",
+          "enum": ["critical", "high", "watch", "low"],
+          "description": "Severity at time of acknowledgment"
+        },
+        "threatScore": {
+          "type": "number",
+          "description": "Weighted threat score"
+        },
+        "acknowledgedAt": {
+          "type": "string",
+          "description": "Server timestamp when acknowledged"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Operator investigation note"
+        }
+      },
+      "required": ["trackId", "operatorId", "threatLevel"]
+    },
+    "IncidentReport": {
+      "title": "IncidentReport",
+      "description": "Shared real-time airspace security incident log published by operators.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Incident report unique identifier"
+        },
+        "trackId": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Associated track ID"
+        },
+        "targetCallsign": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Target callsign"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "watch", "routine"],
+          "description": "Incident classification level"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Brief incident summary"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Detailed incident notes and telemetry rationale"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Firebase UID of publishing operator"
+        },
+        "authorCallsign": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Author callsign or display name"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Server timestamp of publication"
+        }
+      },
+      "required": ["id", "trackId", "severity", "title", "authorId"]
+    },
+    "WatchlistItem": {
+      "title": "WatchlistItem",
+      "description": "Shared real-time target surveillance priority watchlist.",
+      "type": "object",
+      "properties": {
+        "trackId": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Target track ID"
+        },
+        "callsign": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Target callsign"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["urgent", "elevated", "routine"],
+          "description": "Surveillance priority"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID of operator who added target to watchlist"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Justification for surveillance"
+        },
+        "addedAt": {
+          "type": "string",
+          "description": "Server timestamp when added"
+        }
+      },
+      "required": ["trackId", "priority", "authorId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Private user and operator profile data."
+    },
+    "/users/{userId}/session/current": {
+      "schema": "AirspaceSession",
+      "description": "Operator current simulation controls and real-time state sync."
+    },
+    "/users/{userId}/acknowledgements/{trackId}": {
+      "schema": "AcknowledgedAlert",
+      "description": "Track alert acknowledgements recorded by the operator."
+    },
+    "/incidents/{incidentId}": {
+      "schema": "IncidentReport",
+      "description": "Shared real-time airspace security incident log for the command deck."
+    },
+    "/watchlist/{trackId}": {
+      "schema": "WatchlistItem",
+      "description": "Shared real-time target priority surveillance list."
+    }
+  }
+}

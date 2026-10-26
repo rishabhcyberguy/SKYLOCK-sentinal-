@@ -1,0 +1,144 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Primitives
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // UserProfile Validation
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'email', 'role']) &&
+        data.keys().hasOnly(['userId', 'email', 'displayName', 'callsign', 'role', 'createdAt', 'updatedAt']) &&
+        data.userId is string && data.userId == request.auth.uid &&
+        data.email is string && data.email.size() <= 128 &&
+        data.role in ['operator', 'commander', 'observer', 'admin'] &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 64)) &&
+        (!('callsign' in data) || (data.callsign is string && data.callsign.size() <= 32));
+    }
+
+    // AirspaceSession Validation
+    function isValidSession(data) {
+      return data.keys().hasAll(['userId', 'scenario', 'speed', 'paused']) &&
+        data.keys().hasOnly(['userId', 'scenario', 'speed', 'paused', 'selectedTrackId', 'updatedAt']) &&
+        data.userId is string && data.userId == request.auth.uid &&
+        data.scenario in ['normal', 'anomalous', 'high-threat'] &&
+        data.speed in ['slow', 'normal', 'fast'] &&
+        data.paused is bool &&
+        (!('selectedTrackId' in data) || (data.selectedTrackId is string && data.selectedTrackId.size() <= 32));
+    }
+
+    // AcknowledgedAlert Validation
+    function isValidAcknowledgement(data) {
+      return data.keys().hasAll(['trackId', 'operatorId', 'threatLevel']) &&
+        data.keys().hasOnly(['trackId', 'callsign', 'operatorId', 'operatorCallsign', 'threatLevel', 'threatScore', 'acknowledgedAt', 'notes']) &&
+        data.trackId is string && data.trackId.size() <= 32 &&
+        data.operatorId is string && data.operatorId == request.auth.uid &&
+        data.threatLevel in ['critical', 'high', 'watch', 'low'] &&
+        (!('callsign' in data) || (data.callsign is string && data.callsign.size() <= 32)) &&
+        (!('threatScore' in data) || data.threatScore is number) &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 500));
+    }
+
+    // IncidentReport Validation
+    function isValidIncident(data) {
+      return data.keys().hasAll(['id', 'trackId', 'severity', 'title', 'authorId']) &&
+        data.keys().hasOnly(['id', 'trackId', 'targetCallsign', 'severity', 'title', 'summary', 'authorId', 'authorCallsign', 'createdAt']) &&
+        data.id is string && data.id.size() <= 64 &&
+        data.trackId is string && data.trackId.size() <= 32 &&
+        data.authorId is string && data.authorId == request.auth.uid &&
+        data.severity in ['critical', 'high', 'watch', 'routine'] &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 128 &&
+        (!('targetCallsign' in data) || (data.targetCallsign is string && data.targetCallsign.size() <= 32)) &&
+        (!('summary' in data) || (data.summary is string && data.summary.size() <= 1000));
+    }
+
+    // WatchlistItem Validation
+    function isValidWatchlist(data) {
+      return data.keys().hasAll(['trackId', 'priority', 'authorId']) &&
+        data.keys().hasOnly(['trackId', 'callsign', 'priority', 'authorId', 'reason', 'addedAt']) &&
+        data.trackId is string && data.trackId.size() <= 32 &&
+        data.authorId is string && data.authorId == request.auth.uid &&
+        data.priority in ['urgent', 'elevated', 'routine'] &&
+        (!('callsign' in data) || (data.callsign is string && data.callsign.size() <= 32)) &&
+        (!('reason' in data) || (data.reason is string && data.reason.size() <= 256));
+    }
+
+    // User Profile & Private Subcollections
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming()) &&
+        incoming().userId == existing().userId;
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Current session sync
+      match /session/{sessionId} {
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(sessionId) && isValidSession(incoming());
+        allow update: if isOwner(userId) && isValidId(sessionId) && isValidSession(incoming()) &&
+          incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+      }
+
+      // Track alert acknowledgements
+      match /acknowledgements/{trackId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(trackId) && isValidAcknowledgement(incoming());
+        allow update: if isOwner(userId) && isValidId(trackId) && isValidAcknowledgement(incoming()) &&
+          incoming().operatorId == existing().operatorId;
+        allow delete: if isOwner(userId) && isValidId(trackId);
+      }
+    }
+
+    // Shared Incident Reports
+    match /incidents/{incidentId} {
+      allow get: if isSignedIn() && isValidId(incidentId);
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(incidentId) && isValidIncident(incoming());
+      allow update: if isSignedIn() && isValidId(incidentId) && isValidIncident(incoming()) &&
+        existing().authorId == request.auth.uid &&
+        incoming().authorId == existing().authorId &&
+        incoming().id == existing().id;
+      allow delete: if isSignedIn() && isValidId(incidentId) && existing().authorId == request.auth.uid;
+    }
+
+    // Shared Target Priority Watchlist
+    match /watchlist/{trackId} {
+      allow get: if isSignedIn() && isValidId(trackId);
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(trackId) && isValidWatchlist(incoming());
+      allow update: if isSignedIn() && isValidId(trackId) && isValidWatchlist(incoming()) &&
+        existing().authorId == request.auth.uid &&
+        incoming().authorId == existing().authorId;
+      allow delete: if isSignedIn() && isValidId(trackId) && existing().authorId == request.auth.uid;
+    }
+
+    // Diagnostics / Connection health test probe
+    match /test/{docId} {
+      allow get: if true;
+    }
+  }
+}

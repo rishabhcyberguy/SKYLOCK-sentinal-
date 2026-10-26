@@ -1,0 +1,14 @@
+{
+  "name": "SKYLOCK SENITAL",
+  "short_name": "SKYLOCK",
+  "description": "Counter-drone monitoring and airspace security platform with Firebase real-time database, Google Authentication, and trajectory prediction.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#081a27",
+  "theme_color": "#081a27",
+  "orientation": "any",
+  "icons": [
+    { "src": "/assets/logo.png", "sizes": "440x440", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
